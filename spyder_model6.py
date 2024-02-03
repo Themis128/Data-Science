@@ -18,10 +18,9 @@ dataset_path = 'jobs_in_data.csv'  # Update this path
 jobs_data = pd.read_csv(dataset_path)
 
 # Preprocessing
-# Assuming these columns are in your dataset. Adjust as necessary.
 categorical_columns = ['job_title', 'job_category', 'salary_currency', 'employee_residence', 'experience_level', 'employment_type', 'company_location', 'company_size']
 numerical_columns = ['work_year', 'salary', 'salary_in_usd']
-target_column = 'work_setting'  # Assuming this is your target variable
+target_column = 'work_setting'  # Make sure this column exists
 
 # Encode categorical and target variables
 le = LabelEncoder()
@@ -49,30 +48,36 @@ output_dir = 'C:\\Users\\baltz\\OneDrive - Ελληνικό Ανοικτό Πα�
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-# Generating and saving the confusion matrix plot
+# Save and add the confusion matrix plot to the document
+confusion_matrix_path = os.path.join(output_dir, 'confusion_matrix.png')
 plt.figure(figsize=(10, 7))
 cm = confusion_matrix(y_test, y_pred)
 sns.heatmap(cm, annot=True, fmt="d", cmap='Blues')
 plt.xlabel('Predicted')
 plt.ylabel('True')
 plt.title('Confusion Matrix')
-plt.savefig(os.path.join(output_dir, 'confusion_matrix.png'))
+plt.savefig(confusion_matrix_path)
 plt.close()
 
-# Generating and saving the feature importance plot
-feature_importances = pd.Series(clf.feature_importances_, index=X.columns)
+# Save and add the feature importance plot to the document
+feature_importances_path = os.path.join(output_dir, 'feature_importances.png')
 plt.figure(figsize=(10, 7))
+feature_importances = pd.Series(clf.feature_importances_, index=X.columns)
 feature_importances.nlargest(10).plot(kind='barh')
 plt.title('Feature Importances')
-plt.savefig(os.path.join(output_dir, 'feature_importances.png'))
+plt.savefig(feature_importances_path)
 plt.close()
 
 # Creating and saving a report document
 doc = Document()
 doc.add_heading('Model Performance Report', 0)
-doc.add_paragraph(f'Accuracy: {accuracy}')
-doc.add_paragraph('Classification report:')
+doc.add_paragraph(f'Accuracy: {accuracy}\n')
+doc.add_paragraph('Classification report:\n')
 doc.add_paragraph(classification_report(y_test, y_pred))
+doc.add_picture(confusion_matrix_path)
+doc.add_paragraph('\n')  # Add some spacing
+doc.add_picture(feature_importances_path)
+
 doc_path = os.path.join(output_dir, 'model_report.docx')
 doc.save(doc_path)
 print(f'Report saved to: {doc_path}')
