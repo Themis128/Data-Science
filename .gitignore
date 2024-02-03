@@ -6,4 +6,5 @@ Include
 etc
 Share
 pyvenv.cfg
+data.csv
 ```
