@@ -9,8 +9,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from docx.shared import Inches
 import os
-import numpy as np
 from pathlib import Path
+from docx.shared import RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 # Improved visualization settings
 plt.rcParams.update({'font.size': 14, 'figure.figsize': (10, 7)})
@@ -44,7 +45,7 @@ y_pred = clf.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 
 # Define the output directory
-output_dir = 'C:\\Users\\baltz\\OneDrive - Ελληνικό Ανοικτό Πανεπιστήμιο\\Επιφάνεια εργασίας\\Model Graphs7'
+output_dir = 'C:\\Users\\baltz\\OneDrive - Ελληνικό Ανοικτό Πανεπιστήμιο\\Επιφάνεια εργασίας\\Model Graphs8'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
@@ -65,9 +66,43 @@ These metrics collectively offer insights into the model's ability to correctly 
 Accuracy provides a general sense of the model's overall performance, while the precision, recall, and F1-score offer a deeper understanding of its performance on a class-by-class basis.
 """
 doc.add_paragraph(report_text)
-classification_report_text = classification_report(y_test, y_pred)
-doc.add_paragraph('Classification report:\n')
-doc.add_paragraph(classification_report_text)
+
+# Classification report in matrix format
+classification_report_text = classification_report(y_test, y_pred, output_dict=True)
+classification_matrix = pd.DataFrame(classification_report_text).transpose()
+
+# Define a function to format cell text color
+def format_color(cell):
+    if cell > 0.8:  # Change this threshold based on your criteria for "acceptable"
+        cell_color = RGBColor(0, 128, 0)  # Green color
+    else:
+        cell_color = RGBColor(255, 0, 0)  # Red color
+    cell.text = f"{cell:.2f}"
+    run = cell.paragraphs[0].runs[0]
+    run.font.color.rgb = cell_color
+
+# Add classification report to the Word document
+doc.add_paragraph('Classification Report (Matrix Format):', style='Heading1')
+doc.add_paragraph()  # Add an empty line
+table = doc.add_table(rows=1, cols=len(classification_matrix.columns))
+table.autofit = False
+
+# Set the column widths
+for i in range(len(classification_matrix.columns)):
+    table.cell(0, i).width = Inches(1.2)
+
+# Add column headers
+for i, column in enumerate(classification_matrix.columns):
+    cell = table.cell(0, i)
+    cell.text = column
+    cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+# Add classification report values to the table with color formatting
+for i, (index, row) in enumerate(classification_matrix.iterrows()):
+    table.add_row().cells
+    for j, cell_value in enumerate(row):
+        cell = table.cell(i + 1, j)
+        format_color(cell)
 
 # Generate, save, and add the confusion matrix plot
 output_dir = Path(output_dir)  # Convert output_dir to a pathlib Path object
