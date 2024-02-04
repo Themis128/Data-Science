@@ -23,7 +23,7 @@ jobs_data = pd.read_csv(dataset_path)
 job_demand = jobs_data['job_title'].value_counts()
 
 # Define the output directory (ensure this path is correct for your environment)
-output_dir = Path('C:/Users/baltz/OneDrive - Ελληνικό Ανοικτό Πανεπιστήμιο/Επιφάνεια εργασίας/Model Graphs')
+output_dir = Path('C:/Users/baltz/OneDrive - Ελληνικό Ανοικτό Πανεπιστήμιο/Επιφάνεια εργασίας/Model Report & Graphs')
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
     
@@ -48,16 +48,16 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 clf = RandomForestClassifier(random_state=42)
 clf.fit(X_train, y_train)
 
-# Evaluation
-y_pred = clf.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
+
     
 
 # Documenting the model performance and crucial job titles for hiring
 doc = Document()
 doc.add_heading('Model Performance and Hiring Focus Report', level=1)
 
-# Assume previous steps for model training and evaluation are here
+# Evaluation
+y_pred = clf.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
 
 # Add a section in the Word document for crucial job titles to hire
 top_n = 10  # Adjust based on your preference

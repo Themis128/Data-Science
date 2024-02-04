@@ -20,6 +20,7 @@ plt.rcParams.update({'font.size': 14, 'figure.figsize': (10, 7)})
 dataset_path = 'jobs_in_data.csv'
 jobs_data = pd.read_csv(dataset_path)
 
+
 # Preprocessing steps
 # Encode categorical and target variables
 le = LabelEncoder()
@@ -45,13 +46,33 @@ y_pred = clf.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 
 # Define the output directory
-output_dir = 'C:\\Users\\baltz\\OneDrive - Ελληνικό Ανοικτό Πανεπιστήμιο\\Επιφάνεια εργασίας\\Model Graphs'
+output_dir = 'C:\\Users\\baltz\\OneDrive - Ελληνικό Ανοικτό Πανεπιστήμιο\\Επιφάνεια εργασίας\\Model Report & Graphs'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-# Documenting the model performance
+# Aggregate the data to count occurrences for each job title, serving as a demand indicator
+job_demand = jobs_data['job_title'].value_counts()
+
+# Documenting the model performance and crucial job titles for hiring
 doc = Document()
-doc.add_heading('Model Performance Report', level=1)  # Use 'level' parameter to specify heading level
+doc.add_heading('Model Performance and Hiring Focus Report', level=1)
+
+# Evaluation
+y_pred = clf.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+# Add a section in the Word document for crucial job titles to hire
+top_n = 10  # Adjust based on your preference
+top_job_titles_demand = job_demand.head(top_n)
+
+# List the top N job titles with their demand
+for job_title, demand in top_job_titles_demand.items():
+    doc.add_padoc.add_heading('Crucial Job Titles to Hire', level=1)
+doc.add_paragraph(
+    "Based on the dataset analysis, the following job titles are identified as crucial for the company to focus its hiring efforts on:"
+)
+
+doc.add.paragraph(f'{job_title}: {demand} occurrences', style='ListBullet')
 
 # Print accuracy to the screen
 print(f'Accuracy: {accuracy:.2f}')
@@ -161,13 +182,40 @@ Based on the model's performance and the importance of specific features, it is 
 
 doc.add_paragraph(recommendations_text)
 
+# Ensure only one Document object is initialized
+doc = Document()
+doc.add_heading('Model Performance and Hiring Focus Report', level=1)
+
+# Model performance and evaluation sections here
+
+# Documenting the model performance
+doc = Document()
+doc.add_heading('Model Performance Report', level=1)  # Use 'level' parameter to specify heading level
+# (These sections have been appropriately adjusted in your script)
+
+# Add crucial job titles to hire section
+top_n = 10  # Adjust based on your preference
+top_job_titles_demand = job_demand.head(top_n)
+
+doc.add_heading('Crucial Job Titles to Hire', level=2)
+doc.add_paragraph(
+    "Based on the dataset analysis, the following job titles are identified as crucial for the company to focus its hiring efforts on:"
+)
+
+for job_title, demand in top_job_titles_demand.items():
+    doc.add_paragraph(f'{job_title}: {demand} occurrences', style='ListBullet')
+
+# Continue with additional analysis and recommendations as per your script
+# Print accuracy to the screen
+print(f'Accuracy: {accuracy:.2f}')
+
+
+doc.add_paragraph(recommendations_text)
+
 # Save the final document with recommendations
 final_doc_path = output_dir / 'HR_Strategic_Recommendations_Report.docx'
 doc.save(final_doc_path)
 print(f'Report with strategic recommendations saved to: {final_doc_path}')
 
 
-# Save the Word document
-#doc_path = output_dir / 'model_report.docx'
-#doc.save(doc_path)
-#print(f'Report saved to: {doc_path}')
+
